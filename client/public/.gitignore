@@ -1,0 +1,17 @@
+node modules/
+dist/
+.env
+.DS_Store
+.vscode/
+npm-debug.log
+yarn-error.log      
+coverage/
+.idea/
+*.local
+*.log
+*.tsbuildinfo
+.cache/
+public/build/
+.svelte-kit/
+*.env
+*.env.local

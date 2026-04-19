@@ -1,0 +1,84 @@
+/* --- Bottom Navigation Styling --- */
+.mobile-bottom-nav {
+  display: none; /* ডিফল্টভাবে পিসিতে হাইড থাকবে */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px); /* গ্লাস ইফেক্ট */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15); /* ৩ডি শ্যাডো */
+  z-index: 1001;
+  padding-bottom: env(safe-area-inset-bottom); /* আইফোনের জন্য */
+}
+
+.nav-item {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #64748b;
+  transition: 0.3s;
+  flex: 1;
+}
+
+.nav-item .icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-item .label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* অ্যাক্টিভ লিংক স্টাইল */
+.nav-item.active {
+  color: #003580;
+}
+
+.nav-item.active .icon {
+  transform: translateY(-8px) scale(1.2); /* ৩ডি জাম্প ইফেক্ট */
+  background: #ffcc00;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 8px 15px rgba(0, 53, 128, 0.2);
+}
+
+.nav-item.active .label {
+  color: #003580;
+  font-weight: 800;
+}
+
+/* রেসপনসিভ লজিক */
+@media (min-width: 851px) {
+  .mobile-bottom-nav {
+    display: none !important; /* পিসিতে দেখাবে না */
+  }
+}
+
+@media (max-width: 850px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  /* বটম নেভিগেশন যাতে মেইন কন্টেন্ট ঢেকে না ফেলে */
+  main {
+    padding-bottom: 80px !important;
+  }
+
+  /* মোবাইলে ফুটার হাইড করে দেয়া ভালো কারণ বটম নেভ আছে */
+  .main-footer {
+    display: none;
+  }
+}
