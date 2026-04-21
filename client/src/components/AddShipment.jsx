@@ -9,19 +9,13 @@ export default function AddShipment() {
   const [agencies, setAgencies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // কারগো স্পেসিফিক ফরম স্টেট
   const [form, setForm] = useState({
-    // Sender (Customer) Info
     customerName: "",
     customerMobile: "",
     agency: "",
-
-    // Receiver Info
     receiverName: "",
     receiverMobile: "",
     receiverAddress: "",
-
-    // Cargo Details
     weight: "",
     boxCount: 1,
     shipmentType: "Air",
@@ -83,11 +77,40 @@ export default function AddShipment() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // ফোন নাম্বার দিয়ে কাস্টমার সার্চ এবং অটো-ফিল লজিক
+  const handleCustomerSearch = async (phone) => {
+    if (!phone || phone.length < 11) return;
+
+    try {
+      const res = await axios.get(`/api/customers/search/${phone}`);
+      if (res.data) {
+        // ✅ Regex লজিক: নামের শেষে থাকা (শিপমেন্ট ১) বা (শিপমেন্ট ২) মুছে ফেলবে
+        const cleanName = res.data.fullName
+          .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
+          .trim();
+
+        setForm((prev) => ({
+          ...prev,
+          customerName: `${cleanName} (শিপমেন্ট ${res.data.nextShipmentNumber})`,
+          customerMobile: res.data.phoneNumber,
+          agency: res.data.agency || prev.agency,
+        }));
+      }
+    } catch (err) {
+      // নতুন কাস্টমার হলে
+      const cleanName = form.customerName
+        .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
+        .trim();
+      setForm((prev) => ({
+        ...prev,
+        customerName: cleanName ? `${cleanName} (শিপমেন্ট 1)` : "",
+      }));
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // ব্যাকএন্ডের রিকোয়েস্ট ফরম্যাট অনুযায়ী ডাটা সাজানো
     const payload = {
       customerData: {
         fullName: form.customerName,
@@ -112,10 +135,10 @@ export default function AddShipment() {
       const method = id ? "put" : "post";
       await axios[method](url, payload);
 
-      alert(id ? "Shipment Updated Successfully" : "New Shipment Booked!");
+      alert(id ? "শিপমেন্ট আপডেট হয়েছে" : "নতুন শিপমেন্ট বুকিং সম্পন্ন হয়েছে");
       navigate("/shipment-list");
     } catch (err) {
-      alert(err.response?.data?.error || "Error saving shipment");
+      alert(err.response?.data?.error || "সেভ করতে সমস্যা হয়েছে");
     } finally {
       setLoading(false);
     }
@@ -132,19 +155,24 @@ export default function AddShipment() {
             <h3>👤 Sender Information</h3>
             <div className="grid-2">
               <div>
-                <label>Sender Name *</label>
+                <label>
+                  Sender Mobile (সার্চ করতে নম্বর লিখে বাইরে ক্লিক করুন) *
+                </label>
                 <input
-                  name="customerName"
-                  value={form.customerName}
+                  name="customerMobile"
+                  placeholder="017XXXXXXXX"
+                  value={form.customerMobile}
                   onChange={handleChange}
+                  onBlur={(e) => handleCustomerSearch(e.target.value)} // ফোকাস হারালে সার্চ করবে
                   required
                 />
               </div>
               <div>
-                <label>Sender Mobile *</label>
+                <label>Sender Name *</label>
                 <input
-                  name="customerMobile"
-                  value={form.customerMobile}
+                  name="customerName"
+                  placeholder="পুরো নাম লিখুন"
+                  value={form.customerName}
                   onChange={handleChange}
                   required
                 />
@@ -280,18 +308,14 @@ export default function AddShipment() {
         .form-section { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff; }
         h2 { color: #333; margin-bottom: 20px; text-align: center; }
         h3 { font-size: 16px; color: #007bff; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        
         label { display: block; margin-top: 10px; font-weight: 600; font-size: 13px; color: #555; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
         .total-input { border: 2px solid #007bff; font-weight: bold; font-size: 18px; color: #007bff; }
-        
         .btn-save { margin-top: 25px; padding: 15px; width: 100%; background: #007bff; color: #fff; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-save:hover { background: #0056b3; }
         .btn-save:disabled { background: #ccc; }
-
         .no-spin::-webkit-outer-spin-button, .no-spin::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
       `}</style>
     </div>

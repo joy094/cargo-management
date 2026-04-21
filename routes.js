@@ -20,7 +20,66 @@ const router = express.Router();
 router.post("/auth/login", LOGIN_RATE_LIMIT, loginHandler);
 router.use(authMiddleware);
 
+// সকল কাস্টমারের সামারি লিস্ট বের করা
+router.get("/reports/customer-summary", async (req, res) => {
+  try {
+    const customers = await Customer.find();
+    const summaryList = await Promise.all(
+      customers.map(async (c) => {
+        const shipments = await Shipment.find({ customer: c._id });
+
+        const totalBill = shipments.reduce((sum, s) => sum + s.totalCharge, 0);
+        const totalPaid = shipments.reduce((sum, s) => sum + s.paidAmount, 0);
+
+        return {
+          _id: c._id,
+          name: c.fullName,
+          mobile: c.phoneNumber,
+          totalShipments: shipments.length,
+          totalBill,
+          totalPaid,
+          totalDue: totalBill - totalPaid,
+        };
+      }),
+    );
+    res.json(summaryList);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /* =====================================================
+   কাস্টমার প্রোফাইল ও শিপমেন্ট লিস্ট এপিআই
+   পাথ: GET /api/customers/:id
+===================================================== */
+router.get("/customers/:id", async (req, res) => {
+  try {
+    // ১. কাস্টমার আইডি দিয়ে কাস্টমার খুঁজবে
+    const customer = await Customer.findById(req.params.id).populate("agency");
+
+    if (!customer) {
+      return res.status(404).json({ error: "কাস্টমার পাওয়া যায়নি!" });
+    }
+
+    // ২. এই কাস্টমারের অধীনে থাকা সকল শিপমেন্ট বের করবে
+    const shipments = await Shipment.find({ customer: customer._id }).sort({
+      createdAt: -1,
+    });
+
+    // ৩. ফ্রন্টএন্ডের ডিমান্ড অনুযায়ী ডাটা পাঠানো
+    res.json({ customer, shipments });
+  } catch (err) {
+    console.error("Customer Profile Error:", err);
+    res.status(500).json({ error: "সার্ভার এরর: ডাটা লোড করা যায়নি।" });
+  }
+});
+/* 
+
+
+
+
+
+=====================================================
    1️⃣ BRANCH / AGENCY CONTROLLERS
 ===================================================== */
 
@@ -208,57 +267,51 @@ router.delete("/agencies/:id", async (req, res) => {
 // });
 
 /* =====================================================
-   Add New Shipment (Customer Check সহ ফিক্সড লজিক)
+   Add New Shipment (Name Cleanup লজিকসহ)
 ===================================================== */
 router.post("/shipments", async (req, res) => {
   try {
     const { customerData, shipmentData } = req.body;
 
-    // ১. ফোন নাম্বার দিয়ে কাস্টমার চেক করা (Duplicate Error এড়াতে)
+    // ১. নাম প্রসেস করা
+    const rawName = customerData.fullName || ""; // এটা হলো "মাহবুব (শিপমেন্ট ২)"
+    const cleanName = rawName
+      .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
+      .trim(); // এটা হলো "মাহবুব"
+
+    // ২. কাস্টমার হ্যান্ডলিং (প্রোফাইলে ক্লিন নাম থাকবে)
     let customer = await Customer.findOne({
       phoneNumber: customerData.phoneNumber,
     });
 
     if (!customer) {
-      // যদি কাস্টমার না থাকে, তবেই নতুন তৈরি করবে
       customer = await Customer.create({
         ...customerData,
+        fullName: cleanName,
         agency: shipmentData.agency,
       });
-      console.log("New customer created");
     } else {
-      // যদি কাস্টমার থাকে, তবে তার তথ্য আপডেট করতে চাইলে করতে পারেন (অপশনাল)
-      customer.fullName = customerData.fullName;
+      customer.fullName = cleanName;
       customer.agency = shipmentData.agency;
       await customer.save();
-      console.log("Existing customer used");
     }
 
-    // ২. ট্র্যাকিং নম্বর জেনারেট করা
+    // ৩. ট্র্যাকিং নম্বর
     const trackingNumber = `TRK-${Date.now().toString().slice(-6)}`;
 
-    // ৩. শিপমেন্ট তৈরি করা এবং কাস্টমার আইডি লিংক করা
+    // ৪. শিপমেন্ট তৈরি (এখানেই ব্র্যাকেটসহ নাম সেভ হবে)
     const shipment = await Shipment.create({
       ...shipmentData,
-      customer: customer._id, // আগের বা নতুন কাস্টমার আইডি
+      customer: customer._id,
+      shipmentLabel: rawName, // ✅ এখানে ব্র্যাকেটসহ নামটা হুবহু সেভ হবে
       trackingNumber,
     });
 
     res.json({ success: true, shipment, customer });
   } catch (err) {
-    console.error("Shipment Save Error:", err);
-
-    // যদি অন্য কোনো কারণে ডুপ্লিকেট এরর আসে (যেমন ট্র্যাকিং নম্বর)
-    if (err.code === 11000) {
-      return res.status(400).json({
-        error: "এই কাস্টমার বা ট্র্যাকিং নম্বরটি ইতিমধ্যে ডাটাবেজে রয়েছে।",
-      });
-    }
-
     res.status(400).json({ error: err.message });
   }
 });
-
 
 //update shipment route
 router.put("/shipments/:id", async (req, res) => {
@@ -284,12 +337,32 @@ router.delete("/shipments/:id", async (req, res) => {
   }
 });
 
-
-
 // Get All Shipments
 router.get("/shipments", async (req, res) => {
   const list = await Shipment.find().populate("customer").populate("agency");
   res.json(list);
+});
+
+//auto fill customer data by phone number (for shipment form) - new route
+router.get("/customers/search/:phone", async (req, res) => {
+  try {
+    const customer = await Customer.findOne({ phoneNumber: req.params.phone });
+    if (customer) {
+      // এই কাস্টমারের মোট কয়টি শিপমেন্ট আছে তা গুনে দেখা
+      const shipmentCount = await Shipment.countDocuments({
+        customer: customer._id,
+      });
+
+      res.json({
+        ...customer.toObject(),
+        nextShipmentNumber: shipmentCount + 1, // পরবর্তী শিপমেন্ট নম্বর
+      });
+    } else {
+      res.status(404).json({ message: "New Customer", nextShipmentNumber: 1 });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* =====================================================

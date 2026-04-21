@@ -46,8 +46,12 @@ const ShipmentSchema = new Schema(
     customer: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
     agency: { type: Schema.Types.ObjectId, ref: "Agency", required: true },
     receiverName: { type: String, required: true },
-    receiverMobile: { type: String, required: true },
+    receiverMobile: { type: String },
     receiverAddress: String,
+    shipmentLabel: {
+      type: String,
+      required: true,
+    },
     weight: { type: Number, default: 0 },
     boxCount: { type: Number, default: 1 },
     shipmentType: {

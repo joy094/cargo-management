@@ -1,3 +1,5 @@
+//src/components/ShipmentList.jsx
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -134,7 +136,10 @@ export default function ShipmentList() {
             {shipments.map((s) => (
               <tr key={s._id}>
                 <td className="tracking-id">{s.trackingNumber}</td>
-                <td>{s.customer?.fullName || "Unknown"}</td>
+
+                {/* পরিবর্তন এখানে: যদি shipmentLabel থাকে তবে সেটা দেখাবে, না থাকলে মেইন নাম */}
+                <td>{s.shipmentLabel || s.customer?.fullName || "Unknown"}</td>
+                
                 <td>{s.agency?.name || "-"}</td>
                 <td>{s.weight} KG</td>
                 <td>৳ {s.totalCharge}</td>

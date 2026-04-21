@@ -1,0 +1,215 @@
+/* Tiro Bangla Font Setup */
+@import url("https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&display=swap");
+
+.customer-list-page {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: "Tiro Bangla", serif;
+}
+
+/* --- Header & Search Bar --- */
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  gap: 15px;
+  flex-wrap: wrap; /* মোবাইলে নিচে নেমে আসবে */
+}
+
+.header-flex h2 {
+  margin: 0;
+  color: #003580;
+  font-size: 24px;
+}
+
+.search-input {
+  padding: 12px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 350px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #003580;
+  box-shadow: 0 0 10px rgba(0, 53, 128, 0.1);
+  transform: translateY(-2px);
+}
+
+/* --- Table Styling --- */
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cargo-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.cargo-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  text-align: left;
+  padding: 18px 15px;
+  border-bottom: 2px solid #edf2f7;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.cargo-table td {
+  padding: 15px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.cargo-table tr:hover {
+  background-color: #f8fbff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Badge & Amounts */
+.count-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.view-btn {
+  background: #003580;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.view-btn:hover {
+  background: #002152;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 53, 128, 0.2);
+}
+
+/* --- Responsive Layout (Mobile Friendly) --- */
+@media (max-width: 850px) {
+  .header-flex {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .search-input {
+    max-width: 100%;
+  }
+
+  /* টেবিলকে কার্ডে রূপান্তর করার ম্যাজিক */
+  .cargo-table thead {
+    display: none; /* হেডার হাইড */
+  }
+
+  .cargo-table,
+  .cargo-table tbody,
+  .cargo-table tr,
+  .cargo-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .cargo-table tr {
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    padding: 10px;
+  }
+
+  .cargo-table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .cargo-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* কলামের নামগুলো মোবাইলে বাম পাশে দেখাবে */
+  .cargo-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .view-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+  }
+}
+
+.filter-controls {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.branch-select {
+  padding: 12px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-family: "Tiro Bangla", serif;
+  font-size: 15px;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+  min-width: 200px;
+}
+
+.branch-select:focus {
+  border-color: #003580;
+}
+
+.no-data {
+  padding: 40px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+@media (max-width: 850px) {
+  .filter-controls {
+    width: 100%;
+  }
+  .branch-select {
+    width: 100%;
+  }
+}

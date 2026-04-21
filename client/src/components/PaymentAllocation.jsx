@@ -276,7 +276,10 @@ export default function PaymentAllocation() {
                       />
                     </td>
                     <td className="trk-no">{s.trackingNumber}</td>
-                    <td>{s.customer?.fullName}</td>
+                    {/* পরিবর্তন এখানে: যদি shipmentLabel থাকে তবে সেটা দেখাবে, না থাকলে মেইন নাম */}
+                    <td>
+                      {s.shipmentLabel || s.customer?.fullName || "Unknown"}
+                    </td>
                     <td>{s.agency?.name}</td>
                     <td>৳ {s.totalCharge}</td>
                     <td className="due-text">৳ {due}</td>

@@ -15,6 +15,8 @@ import AddShipment from "./components/AddShipment"; // AddHajji -> AddShipment
 import NotificationSounds from "./components/NotificationSounds";
 import Login from "./components/Login";
 import BottomNav from "./components/BottomNav";
+import CustomerList from "./components/CustomerList";
+import CustomerProfile from "./components/CustomerProfile";
 
 // Layout Component
 export const Layout = () => {
@@ -47,7 +49,6 @@ export const Layout = () => {
 };
 
 // Header Component (মডিফাইড ফর কারগো)
-
 
 const Header = () => {
   const navigate = useNavigate();
@@ -94,8 +95,17 @@ const Header = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/shipments" onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink
+              to="/shipment-list"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               শিপমেন্টস
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/customers" className="nav-link">
+              কাস্টমারস
             </NavLink>
           </li>
           <li>
@@ -156,6 +166,7 @@ const App = () => (
       <Route path="/" element={<Dashboard />} />
 
       {/* Agency/Branch Management */}
+
       <Route path="/agency-list" element={<AgencyList />} />
       <Route path="/agencies/new" element={<AddAgency />} />
       <Route path="/agencies/:id/edit" element={<AddAgency />} />
@@ -166,6 +177,9 @@ const App = () => (
       <Route path="/shipment-profile/:id" element={<ShipmentProfile />} />
       <Route path="/shipment/new" element={<AddShipment />} />
       <Route path="/shipment/:id" element={<AddShipment />} />
+      {/* customers mamnagement */}
+      <Route path="/customers" element={<CustomerList />} />
+      <Route path="/customer-profile/:id" element={<CustomerProfile />} />
 
       {/* Payment System */}
       <Route path="/payment-allocation" element={<PaymentAllocation />} />
