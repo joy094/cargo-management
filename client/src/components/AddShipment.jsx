@@ -16,6 +16,7 @@ export default function AddShipment() {
     receiverName: "",
     receiverMobile: "",
     receiverAddress: "",
+    itemName: "",
     weight: "",
     boxCount: 1,
     shipmentType: "Air",
@@ -52,6 +53,7 @@ export default function AddShipment() {
           receiverName: s.receiverName,
           receiverMobile: s.receiverMobile,
           receiverAddress: s.receiverAddress || "",
+          itemName: s.itemName || "",
           weight: s.weight,
           boxCount: s.boxCount,
           shipmentType: s.shipmentType,
@@ -121,6 +123,7 @@ export default function AddShipment() {
         receiverName: form.receiverName,
         receiverMobile: form.receiverMobile,
         receiverAddress: form.receiverAddress,
+        itemName: form.itemName,
         weight: parseFloat(form.weight) || 0,
         boxCount: parseInt(form.boxCount) || 1,
         shipmentType: form.shipmentType,
@@ -229,6 +232,18 @@ export default function AddShipment() {
           <div className="form-section">
             <h3>⚖️ Cargo & Pricing</h3>
             <div className="grid-3">
+
+
+
+            <div>
+                <label>Item Name</label>
+                <input
+                  type="text"
+                  name="itemName"
+                  value={form.itemName}
+                  onChange={handleChange}
+                />
+              </div>
               <div>
                 <label>Weight (KG)</label>
                 <input

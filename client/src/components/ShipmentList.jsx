@@ -125,6 +125,7 @@ export default function ShipmentList() {
               <th>Tracking No</th>
               <th>Customer Name</th>
               <th>Branch</th>
+              <th>Item</th>
               <th>Weight</th>
               <th>Total</th>
               <th>Paid</th>
@@ -141,6 +142,7 @@ export default function ShipmentList() {
                 <td>{s.shipmentLabel || s.customer?.fullName || "Unknown"}</td>
                 
                 <td>{s.agency?.name || "-"}</td>
+                <td>{s.itemName || "-"}</td>
                 <td>{s.weight} KG</td>
                 <td>৳ {s.totalCharge}</td>
                 <td className="paid-amt">৳ {s.paidAmount}</td>

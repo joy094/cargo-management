@@ -52,6 +52,9 @@ const ShipmentSchema = new Schema(
       type: String,
       required: true,
     },
+
+
+    itemName: { type: String, required: true },
     weight: { type: Number, default: 0 },
     boxCount: { type: Number, default: 1 },
     shipmentType: {

@@ -86,11 +86,12 @@ export default function ShipmentProfile() {
           <span style={styles.trackingText}>{shipment.trackingNumber}</span>
         </div>
         <div style={styles.detailItem}>
-          <strong>Weight:</strong> {shipment.weight} KG
+          <strong>Item:</strong> {shipment.itemName || "N/A"}
         </div>
         <div style={styles.detailItem}>
-          <strong>Boxes:</strong> {shipment.boxCount}
+          <strong>Weight:</strong> {shipment.weight} KG
         </div>
+
         <div style={styles.detailItem}>
           <strong>Status:</strong>{" "}
           <span style={{ ...styles.statusBadge, ...styles[shipment.status] }}>

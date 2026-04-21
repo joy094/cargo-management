@@ -314,14 +314,40 @@ router.post("/shipments", async (req, res) => {
 });
 
 //update shipment route
+// আপডেট শিপমেন্ট রাউট (Fix করা হয়েছে)
 router.put("/shipments/:id", async (req, res) => {
   try {
-    const updated = await Shipment.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const { customerData, shipmentData } = req.body;
+
+    // ১. নাম ক্লিন করার লজিক (যদি এডিট করার সময় নাম বদলানো হয়)
+    const rawName = customerData.fullName || "";
+    const cleanName = rawName
+      .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
+      .trim();
+
+    // ২. কাস্টমার প্রোফাইল আপডেট
+    const currentShipment = await Shipment.findById(req.params.id);
+    if (currentShipment && currentShipment.customer) {
+      await Customer.findByIdAndUpdate(currentShipment.customer, {
+        fullName: cleanName,
+        phoneNumber: customerData.phoneNumber,
+      });
+    }
+
+    // ৩. শিপমেন্ট ডাটা আপডেট (itemName এখানে ম্যাপ করা হয়েছে)
+    const updated = await Shipment.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...shipmentData, // এর ভেতর itemName, weight, boxCount সব আছে
+        shipmentLabel: rawName, // লেবেল আপডেট
+      },
+      { new: true },
+    );
+
     if (!updated) return res.status(404).json({ error: "Shipment not found" });
     res.json(updated);
   } catch (err) {
+    console.error("Update Error:", err);
     res.status(400).json({ error: err.message });
   }
 });
