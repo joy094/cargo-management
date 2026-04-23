@@ -64,7 +64,7 @@ export default function CustomerProfile() {
           <p>৳ {totalPaid.toLocaleString()}</p>
         </div>
         <div className="stat-card due">
-          <h3>মোট বকেয়া</h3>
+          <h3>মোট বকেয়া</h3>
           <p>৳ {totalDue.toLocaleString()}</p>
         </div>
         <div className="stat-card count">
@@ -83,9 +83,12 @@ export default function CustomerProfile() {
                 <th>তারিখ</th>
                 <th>ট্র্যাকিং নং</th>
                 <th>শিপমেন্ট লেবেল</th>
+                <th>আইটেম</th>
+                <th>ওজন</th>
+
                 <th>বিল</th>
                 <th>জমা</th>
-                <th>বকেয়া</th>
+                <th>বকেয়া</th>
                 <th>অবস্থা</th>
               </tr>
             </thead>
@@ -94,7 +97,9 @@ export default function CustomerProfile() {
                 <tr key={s._id}>
                   <td>{new Date(s.createdAt).toLocaleDateString("bn-BD")}</td>
                   <td className="trk">{s.trackingNumber}</td>
-                  <td>{s.shipmentLabel || "N/A"}</td>
+                  <td>{s.shipmentLabel || s.customer?.fullName || "N/A"}</td>
+                  <td>{s.itemName}</td>
+                  <td>{s.weight}</td>
                   <td>৳ {s.totalCharge}</td>
                   <td className="paid-text">৳ {s.paidAmount}</td>
                   <td className="due-text">৳ {s.totalCharge - s.paidAmount}</td>

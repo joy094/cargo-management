@@ -1,4 +1,3 @@
-
 //src/components/AgencyProfile.jsx
 
 import { useEffect, useState } from "react";
@@ -119,7 +118,10 @@ export default function AgencyProfile() {
           <tr>
             <th>Tracking No</th>
             <th>Customer</th>
+            <th>Item</th>
             <th>Weight</th>
+            <th>Item</th>
+
             <th>Total Charge</th>
             <th>Paid</th>
             <th>Due</th>
@@ -132,7 +134,9 @@ export default function AgencyProfile() {
               <td>
                 <strong>{sh.trackingNumber}</strong>
               </td>
-              <td>{sh.customer?.fullName || "N/A"}</td>
+              <td>{sh.shipmentLabel || sh.customer?.fullName || "N/A"}</td>
+              <td>{sh.itemName}</td>
+
               <td>{sh.weight} KG</td>
               <td>৳ {sh.totalCharge}</td>
               <td>৳ {sh.paidAmount}</td>
