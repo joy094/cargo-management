@@ -120,7 +120,6 @@ export default function AgencyProfile() {
             <th>Customer</th>
             <th>Item</th>
             <th>Weight</th>
-            <th>Item</th>
 
             <th>Total Charge</th>
             <th>Paid</th>
