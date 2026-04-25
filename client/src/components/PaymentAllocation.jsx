@@ -1,3 +1,6 @@
+
+//src/PaymentsAllowcations.jsx
+
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
@@ -50,6 +53,7 @@ export default function PaymentAllocation() {
       })
       .catch((err) => console.error("Error fetching agencies:", err));
   }, []);
+  
 
   // ৪. শিপমেন্ট সিলেকশন হ্যান্ডলার
   const handleShipmentSelect = (shipmentId) => {

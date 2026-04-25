@@ -4,8 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "nodemon index.js",
+    "client": "npm run dev --prefix ./client",
+    "dev": "concurrently \"npm run start\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -20,7 +21,9 @@
     "helmet": "^6.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.1",
-    "nodemon": "^3.1.11",
-    "react-toastify": "^11.0.5"
+    "nodemon": "^3.1.11"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

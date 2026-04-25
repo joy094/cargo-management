@@ -391,6 +391,9 @@ router.get("/customers/search/:phone", async (req, res) => {
   }
 });
 
+
+
+
 /* =====================================================
    3️⃣ PAYMENT ALLOCATION (With Duplicate Filter)
 ===================================================== */
@@ -415,6 +418,7 @@ router.post("/payments/allocate", async (req, res) => {
     if (lockExists) {
       return res.status(400).json({
         error: `এই স্টেটমেন্ট নম্বরটি ইতিমধ্যে ${lockExists.appSource} সিস্টেমে ব্যবহার করা হয়েছে।`,
+        
       });
     }
 
@@ -470,6 +474,8 @@ router.post("/payments/allocate", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 /* =====================================================
    4️⃣ REPORTS (Cargo Focused)
@@ -529,5 +535,29 @@ router.delete("/statements/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+
+
+
+// Recent Payments Route
+router.get("/payments/recent", async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 recent payments
+    const recentPayments = await PaymentAllocation.find()
+      .populate("shipment")
+      .populate("customer")
+      .populate("agency")
+      .populate("statement")
+      .sort({ paymentDate: -1 })
+      .limit(limit);
+
+    res.json(recentPayments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 export default router;
