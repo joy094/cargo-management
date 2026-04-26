@@ -13,6 +13,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { authMiddleware } from "./auth.js";
 import routes from "./routes.js";
+import batchRoute from "./batchRoute.js"
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(express.json());
    Routes
 =========================== */
 app.use("/api", routes);
+app.use("/api", batchRoute);
 
 /* ===========================
    MongoDB Connection

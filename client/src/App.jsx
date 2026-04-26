@@ -17,7 +17,9 @@ import Login from "./components/Login";
 import BottomNav from "./components/BottomNav";
 import CustomerList from "./components/CustomerList";
 import CustomerProfile from "./components/CustomerProfile";
+import BatchList from "./components/BatchList";
 
+import BatchDetails from "./components/BatchDetails";
 // Layout Component
 export const Layout = () => {
   const navigate = useNavigate();
@@ -109,6 +111,11 @@ const Header = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/batches" className="nav-link">
+              শিপমেন্ট লট
+            </NavLink>
+          </li>
+          <li>
             <NavLink
               to="/payment-allocation"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -180,6 +187,9 @@ const App = () => (
       {/* customers mamnagement */}
       <Route path="/customers" element={<CustomerList />} />
       <Route path="/customer-profile/:id" element={<CustomerProfile />} />
+      {/* নতুন ব্যাচ রাউট */}
+      <Route path="/batches" element={<BatchList />} />
+      <Route path="/batches/:id" element={<BatchDetails />} />
 
       {/* Payment System */}
       <Route path="/payment-allocation" element={<PaymentAllocation />} />

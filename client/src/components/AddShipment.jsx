@@ -1,3 +1,5 @@
+//AddShipment.jsx
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +9,7 @@ export default function AddShipment() {
   const navigate = useNavigate();
 
   const [agencies, setAgencies] = useState([]);
+  const [batches, setBatches] = useState([]); // ✅ নতুন ব্যাচ স্টেট
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -17,6 +20,7 @@ export default function AddShipment() {
     receiverMobile: "",
     receiverAddress: "",
     itemName: "",
+    batch: "", // ✅ ব্যাচ ফিল্ড যোগ করা হয়েছে
     weight: "",
     boxCount: 1,
     shipmentType: "Air",
@@ -25,17 +29,26 @@ export default function AddShipment() {
     notes: "",
   });
 
-  // ১. ব্রাঞ্চ/এজেন্সি লোড করা
+  // ১. ব্রাঞ্চ এবং ব্যাচ লিস্ট লোড করা
   useEffect(() => {
-    const loadAgencies = async () => {
+    const loadInitialData = async () => {
       try {
-        const res = await axios.get("/api/agencies");
-        setAgencies(res.data);
+        const [agencyRes, batchRes] = await Promise.all([
+          axios.get("/api/agencies"),
+          axios.get("/api/batches"), // ✅ ব্যাচ ডাটা আনা হচ্ছে
+        ]);
+        setAgencies(agencyRes.data);
+
+        // শুধু সেই ব্যাচগুলো দেখাবো যেগুলোর কাজ এখনো শেষ হয়নি
+        const activeBatches = batchRes.data.filter(
+          (b) => b.status === "Draft" || b.status === "Loaded",
+        );
+        setBatches(activeBatches);
       } catch (err) {
         handleError(err);
       }
     };
-    loadAgencies();
+    loadInitialData();
   }, []);
 
   // ২. এডিট মোড হলে শিপমেন্ট ডাটা লোড করা
@@ -54,6 +67,7 @@ export default function AddShipment() {
           receiverMobile: s.receiverMobile,
           receiverAddress: s.receiverAddress || "",
           itemName: s.itemName || "",
+          batch: s.batch?._id || s.batch || "", // ✅ বিদ্যমান ব্যাচ থাকলে লোড হবে
           weight: s.weight,
           boxCount: s.boxCount,
           shipmentType: s.shipmentType,
@@ -79,18 +93,14 @@ export default function AddShipment() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ফোন নাম্বার দিয়ে কাস্টমার সার্চ এবং অটো-ফিল লজিক
   const handleCustomerSearch = async (phone) => {
     if (!phone || phone.length < 11) return;
-
     try {
       const res = await axios.get(`/api/customers/search/${phone}`);
       if (res.data) {
-        // ✅ Regex লজিক: নামের শেষে থাকা (শিপমেন্ট ১) বা (শিপমেন্ট ২) মুছে ফেলবে
         const cleanName = res.data.fullName
           .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
           .trim();
-
         setForm((prev) => ({
           ...prev,
           customerName: `${cleanName} (শিপমেন্ট ${res.data.nextShipmentNumber})`,
@@ -99,7 +109,6 @@ export default function AddShipment() {
         }));
       }
     } catch (err) {
-      // নতুন কাস্টমার হলে
       const cleanName = form.customerName
         .replace(/\s*\(\s*শিপমেন্ট\s*\d+\s*\)/g, "")
         .trim();
@@ -109,6 +118,7 @@ export default function AddShipment() {
       }));
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -124,6 +134,7 @@ export default function AddShipment() {
         receiverMobile: form.receiverMobile,
         receiverAddress: form.receiverAddress,
         itemName: form.itemName,
+        batch: form.batch || null, // ✅ ব্যাচ আইডি পাঠানো হচ্ছে
         weight: parseFloat(form.weight) || 0,
         boxCount: parseInt(form.boxCount) || 1,
         shipmentType: form.shipmentType,
@@ -137,8 +148,9 @@ export default function AddShipment() {
       const url = id ? `/api/shipments/${id}` : "/api/shipments";
       const method = id ? "put" : "post";
       await axios[method](url, payload);
-
-      alert(id ? "শিপমেন্ট আপডেট হয়েছে" : "নতুন শিপমেন্ট বুকিং সম্পন্ন হয়েছে");
+      alert(
+        id ? "শিপমেন্ট আপডেট হয়েছে" : "নতুন শিপমেন্ট বুকিং সম্পন্ন হয়েছে",
+      );
       navigate("/shipment-list");
     } catch (err) {
       alert(err.response?.data?.error || "সেভ করতে সমস্যা হয়েছে");
@@ -153,7 +165,7 @@ export default function AddShipment() {
         <h2>{id ? "📝 Edit Shipment" : "📦 New Cargo Booking"}</h2>
 
         <form onSubmit={handleSubmit}>
-          {/* Section 1: Customer (Sender) */}
+          {/* Section 1: Sender */}
           <div className="form-section">
             <h3>👤 Sender Information</h3>
             <div className="grid-2">
@@ -166,7 +178,7 @@ export default function AddShipment() {
                   placeholder="017XXXXXXXX"
                   value={form.customerMobile}
                   onChange={handleChange}
-                  onBlur={(e) => handleCustomerSearch(e.target.value)} // ফোকাস হারালে সার্চ করবে
+                  onBlur={(e) => handleCustomerSearch(e.target.value)}
                   required
                 />
               </div>
@@ -231,19 +243,51 @@ export default function AddShipment() {
           {/* Section 3: Cargo Details */}
           <div className="form-section">
             <h3>⚖️ Cargo & Pricing</h3>
-            <div className="grid-3">
 
+            {/* ✅ ব্যাচ সিলেকশন ড্রপডাউন এখানে যোগ করা হয়েছে */}
+            <div style={{ marginBottom: "15px" }}>
+              <label style={{ color: "#007bff" }}>
+                Assign to Flight/Batch (চালান সিলেক্ট করুন)
+              </label>
+              <select name="batch" value={form.batch} onChange={handleChange}>
+                <option value="">
+                  কোনো ব্যাচ ছাড়াই বুকিং দিন (Later Assign)
+                </option>
+                {batches.map((b) => (
+                  <option key={b._id} value={b._id}>
+                    {b.batchName} -{" "}
+                    {new Date(b.flightDate).toLocaleDateString("bn-BD")}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-
-            <div>
+            <div className="grid-2">
+              <div>
                 <label>Item Name</label>
                 <input
                   type="text"
                   name="itemName"
                   value={form.itemName}
                   onChange={handleChange}
+                  placeholder="যেমন: কাপড়, কসমেটিকস"
                 />
               </div>
+              <div>
+                <label>Shipment Type</label>
+                <select
+                  name="shipmentType"
+                  value={form.shipmentType}
+                  onChange={handleChange}
+                >
+                  <option value="Air">Air (Fast)</option>
+                  <option value="Sea">Sea (Standard)</option>
+                  <option value="Road">Road</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid-3" style={{ marginTop: "10px" }}>
               <div>
                 <label>Weight (KG)</label>
                 <input
@@ -266,32 +310,6 @@ export default function AddShipment() {
                 />
               </div>
               <div>
-                <label>Shipment Type</label>
-                <select
-                  name="shipmentType"
-                  value={form.shipmentType}
-                  onChange={handleChange}
-                >
-                  <option value="Air">Air (Fast)</option>
-                  <option value="Sea">Sea (Standard)</option>
-                  <option value="Road">Road</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid-2">
-              <div>
-                <label>Total Charge (Amount) *</label>
-                <input
-                  type="number"
-                  name="totalCharge"
-                  className="total-input"
-                  value={form.totalCharge}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
                 <label>Status</label>
                 <select
                   name="status"
@@ -304,6 +322,18 @@ export default function AddShipment() {
                   <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+              <label>Total Charge (Amount) *</label>
+              <input
+                type="number"
+                name="totalCharge"
+                className="total-input"
+                value={form.totalCharge}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 

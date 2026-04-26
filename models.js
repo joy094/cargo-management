@@ -53,7 +53,6 @@ const ShipmentSchema = new Schema(
       required: true,
     },
 
-
     itemName: { type: String, required: true },
     weight: { type: Number, default: 0 },
     boxCount: { type: Number, default: 1 },
@@ -76,6 +75,8 @@ const ShipmentSchema = new Schema(
       ],
       default: "Booked",
     },
+
+    batch: { type: mongoose.Schema.Types.ObjectId, ref: "Batch" },
     deliveryDate: Date,
     notes: String,
   },
@@ -196,3 +197,22 @@ UserSchema.virtual("isLocked").get(function () {
 });
 
 export const User = model("User", UserSchema);
+
+//Batch
+const BatchSchema = new mongoose.Schema(
+  {
+    batchName: { type: String, required: true, unique: true }, // উদাহরণ: DXB-FLIGHT-001
+    flightNumber: { type: String },
+    flightDate: { type: Date },
+    destination: { type: String },
+    status: {
+      type: String,
+      enum: ["Draft", "Loaded", "In-Transit", "Arrived", "Released"],
+      default: "Draft",
+    },
+    notes: { type: String },
+  },
+  { timestamps: true },
+);
+
+export const Batch= mongoose.model("Batch", BatchSchema);

@@ -1,0 +1,238 @@
+@import url("https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap");
+
+.batch-page {
+  padding: 25px;
+  font-family: "Tiro Bangla", serif;
+  background: #f4f7fa;
+  min-height: 100vh;
+}
+
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.batch-header h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 24px;
+}
+
+.add-batch-btn {
+  background: #003580;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px #002152;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+.add-batch-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px #002152;
+}
+
+/* --- 3D Batch Cards --- */
+.batch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.batch-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  position: relative;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border-bottom: 5px solid #003580;
+  transition: all 0.3s ease;
+}
+
+.batch-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 53, 128, 0.12);
+}
+
+.batch-card h3 {
+  margin: 10px 0;
+  color: #003580;
+  font-size: 20px;
+}
+
+/* --- ডাইনামিক স্ট্যাটাস ব্যাজ --- */
+.batch-status {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-draft {
+  background: #f1f5f9;
+  color: #475569;
+}
+.status-loaded {
+  background: #fef3c7;
+  color: #92400e;
+}
+.status-in-transit {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-arrived {
+  background: #d1fae5;
+  color: #065f46;
+}
+.status-released {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.batch-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 15px;
+}
+
+.batch-footer span {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.details-btn {
+  background: white;
+  border: 1.5px solid #003580;
+  color: #003580;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.details-btn:hover {
+  background: #003580;
+  color: white;
+}
+
+/* --- Modal Styling Updates --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #1e293b;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 5px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.modal-content input:focus {
+  border-color: #003580;
+  box-shadow: 0 0 0 4px rgba(0, 53, 128, 0.05);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.save-btn {
+  background: #003580;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px #002152;
+}
+
+.save-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px #002152;
+}
+
+/* --- Responsive Layout --- */
+@media (max-width: 600px) {
+  .batch-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  .batch-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+}
